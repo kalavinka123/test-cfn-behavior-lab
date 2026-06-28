@@ -71,14 +71,3 @@ Resources:
             - !Ref SubnetId
           SecurityGroups:
             - !Ref SecurityGroupId
-
-  # ===== CHANGESET TEST RESOURCE - COMMENT OUT / DELETE AFTER TESTING =====
-  # Temporary throwaway resource used only to exercise change sets.
-  # It is NOT part of the real infrastructure and is not for production.
-  # ChangeSetTestParam:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "/${AWS::StackName}/changeset-test"
-  #     Type: String
-  #     Value: changeset-test
-  # ===== END CHANGESET TEST RESOURCE =====
