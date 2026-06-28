@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Parent stack - orchestrates the network and ECS child stacks.
+
+Parameters:
+  AwsAccountId:
+    Type: String
+    NoEcho: true
+    AllowedPattern: '^\d{12}$'
+    ConstraintDescription: Must be a 12-digit AWS account ID.
+    Description: AWS account ID, supplied via the parameter file and passed to the ECS child stack.
+  TemplateBaseUrl:
+    Type: String
+    Description: >-
+      Base S3 URL where the child templates are uploaded,
+      e.g. https://my-bucket.s3.amazonaws.com/nested-stack
+
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateBaseUrl}/child-network.yaml"
+
+  EcsStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "${TemplateBaseUrl}/child-ecs.yaml"
+      # TemplateURL: !Sub "${TemplateBaseUrl}/child-ecs-no-import.yaml"
+      Parameters:
+        AwsAccountId: !Ref AwsAccountId
+        VpcId: !ImportValue TestNet-VpcId # Causing the change set validation error
+        SubnetId: !GetAtt [NetworkStack, Outputs.SubnetId]
+        SecurityGroupId: !GetAtt [NetworkStack, Outputs.SecurityGroupId]
